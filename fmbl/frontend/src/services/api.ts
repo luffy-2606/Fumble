@@ -27,9 +27,9 @@ api.interceptors.response.use(
 
 // ─── Auth ────────────────────────────────────────────────────────────────────
 export interface LoginPayload { roll_number: string; password: string }
-export interface RegisterPayload { roll_number: string; full_name: string; email: string; phone?: string; password: string }
-export interface AuthUser { user_id: number; roll_number: string; full_name: string; email: string; role: string; token: string }
-export interface MeUser { user_id: number; roll_number: string; full_name: string; email: string; phone?: string; role: string }
+export interface RegisterPayload { roll_number: string; first_name: string; last_name: string; email: string; phone?: string; password: string }
+export interface AuthUser { user_id: number; roll_number: string; first_name: string; last_name: string; email: string; role: string; token: string }
+export interface MeUser { user_id: number; roll_number: string; first_name: string; last_name: string; email: string; phone?: string; role: string }
 
 export const authApi = {
   login: (data: LoginPayload) => api.post<AuthUser>('/api/auth/login', data).then(r => r.data),
@@ -68,12 +68,14 @@ export const matchesApi = {
 
 // ─── Players ──────────────────────────────────────────────────────────────────
 export interface Player {
-  profile_id: number; full_name: string; roll_number: string; sport_name: string
+  profile_id: number; first_name: string; last_name: string; roll_number: string; sport_name: string
   skill_level: string; position: string; is_available: boolean
 }
 export const playersApi = {
   list: () => api.get<Player[]>('/api/players').then(r => r.data),
   get: (id: number) => api.get<Player>(`/api/players/${id}`).then(r => r.data),
+  create: (data: { user_id: number; sport_id: number; skill_level: string; position?: string; bio?: string }) =>
+    api.post<Player>('/api/players', data).then(r => r.data),
 }
 
 // ─── Teams ────────────────────────────────────────────────────────────────────
@@ -88,7 +90,7 @@ export const teamsApi = {
 
 // ─── Courts ───────────────────────────────────────────────────────────────────
 export interface Booking {
-  booking_id: number; full_name: string; roll_number: string; venue_name: string
+  booking_id: number; first_name: string; last_name: string; roll_number: string; venue_name: string
   sport_name: string; booking_date: string; start_time: string; end_time: string
   status: string; created_at: string
 }
@@ -118,7 +120,7 @@ export const itemsApi = {
 
 // ─── Issuance ─────────────────────────────────────────────────────────────────
 export interface Issuance {
-  issuance_id: number; full_name: string; roll_number: string; item_name: string
+  issuance_id: number; first_name: string; last_name: string; roll_number: string; item_name: string
   quantity: number; issued_at: string; due_date: string; returned_at: string | null; status: string
 }
 export interface CreateIssuancePayload {
@@ -153,7 +155,7 @@ export const sportsApi = {
 
 // ─── Users (admin) ────────────────────────────────────────────────────────────
 export interface User {
-  user_id: number; roll_number: string; full_name: string; email: string
+  user_id: number; roll_number: string; first_name: string; last_name: string; email: string
   phone?: string; role: string; created_at: string
 }
 export const usersApi = {

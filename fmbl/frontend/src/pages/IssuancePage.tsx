@@ -102,7 +102,7 @@ export default function IssuancePage() {
               <label className="form-label">Member</label>
               <select className="form-input" value={targetId} onChange={e => setTargetId(e.target.value)} required>
                 <option value="">Select Member</option>
-                {users.map(u => <option key={u.user_id} value={u.user_id}>{u.full_name} ({u.roll_number})</option>)}
+                {users.map(u => <option key={u.user_id} value={u.user_id}>{u.first_name} {u.last_name} ({u.roll_number})</option>)}
               </select>
             </div>
             <div className="form-group">
@@ -160,7 +160,7 @@ export default function IssuancePage() {
               {data.map((item, i) => (
                 <tr key={item.issuance_id} className={isOverdue(item.due_date, item.status) ? 'row-overdue' : ''}>
                   <td className="text-muted text-sm">{i + 1}</td>
-                  <td className="fw-600">{item.full_name}</td>
+                  <td className="fw-600">{item.first_name} {item.last_name}</td>
                   <td className="text-sm text-muted">{item.roll_number}</td>
                   <td>{item.item_name}</td>
                   <td className="text-sm">{item.quantity}</td>

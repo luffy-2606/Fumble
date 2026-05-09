@@ -18,9 +18,8 @@ export default function CourtsPage() {
   // Booking Form State
   const [showForm, setShowForm] = useState(false)
   const [venueId, setVenueId] = useState('')
-  const [date, setDate] = useState('')
-  const [startTime, setStartTime] = useState('')
-  const [endTime, setEndTime] = useState('')
+  const [date, setDate] = useState(() => new Date().toISOString().split('T')[0]) // Default to today
+  const [startHour, setStartHour] = useState('09:00')
   const [submitting, setSubmitting] = useState(false)
 
   const load = () => {
@@ -39,24 +38,27 @@ export default function CourtsPage() {
 
   const handleBooking = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!venueId || !date || !startTime || !endTime) return
+    if (!venueId || !date || !startHour) return
     if (!user) return
 
     setSubmitting(true)
     setError('')
+    
+    // Calculate end time
+    const [hour] = startHour.split(':')
+    const endHour = `${parseInt(hour, 10) + 1}:00`
+
     try {
       await courtsApi.create({
         user_id: user.user_id,
         venue_id: parseInt(venueId),
         booking_date: date,
-        start_time: startTime,
-        end_time: endTime
+        start_time: startHour,
+        end_time: endHour
       })
       setShowForm(false)
       setVenueId('')
-      setDate('')
-      setStartTime('')
-      setEndTime('')
+      setStartHour('09:00')
       load()
     } catch (err: any) {
       setError(err.response?.data?.error || 'Failed to create booking. Venue might be busy.')
@@ -95,16 +97,18 @@ export default function CourtsPage() {
               </select>
             </div>
             <div className="form-group">
-              <label className="form-label">Date</label>
-              <input className="form-input" type="date" value={date} onChange={e => setDate(e.target.value)} required />
+              <label className="form-label">Date (Today only)</label>
+              <input className="form-input" type="date" value={date} readOnly />
             </div>
             <div className="form-group">
-              <label className="form-label">Start Time</label>
-              <input className="form-input" type="time" value={startTime} onChange={e => setStartTime(e.target.value)} required />
-            </div>
-            <div className="form-group">
-              <label className="form-label">End Time</label>
-              <input className="form-input" type="time" value={endTime} onChange={e => setEndTime(e.target.value)} required />
+              <label className="form-label">Time Slot (1 Hour)</label>
+              <select className="form-input" value={startHour} onChange={e => setStartHour(e.target.value)} required>
+                {[9, 10, 11, 12, 13, 14, 15, 16].map(h => {
+                  const start = `${h.toString().padStart(2, '0')}:00`
+                  const end = `${(h + 1).toString().padStart(2, '0')}:00`
+                  return <option key={start} value={start}>{start} - {end}</option>
+                })}
+              </select>
             </div>
             <div className="form-group" style={{ gridColumn: '1 / -1' }}>
               <button className="btn btn-primary" type="submit" disabled={submitting} style={{ width: '100%' }}>
@@ -145,7 +149,7 @@ export default function CourtsPage() {
               {data.map((b, i) => (
                 <tr key={b.booking_id}>
                   <td className="text-muted text-sm">{i + 1}</td>
-                  <td className="fw-600">{b.full_name}</td>
+                  <td className="fw-600">{b.first_name} {b.last_name}</td>
                   <td className="text-sm text-muted">{b.roll_number}</td>
                   <td>{b.venue_name}</td>
                   <td><span className="badge badge-blue">{b.sport_name}</span></td>

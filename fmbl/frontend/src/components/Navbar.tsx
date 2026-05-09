@@ -58,7 +58,7 @@ export default function Navbar() {
             <>
               <span className="navbar-user">
                 <LayoutDashboard size={13} />
-                {user?.full_name.split(' ')[0]}
+                {`${user?.first_name} ${user?.last_name}`.split(' ')[0]}
               </span>
               <button className="btn btn-outline btn-sm" onClick={handleLogout}>
                 <LogOut size={14} />

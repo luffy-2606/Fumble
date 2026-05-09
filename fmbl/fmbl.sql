@@ -8,7 +8,8 @@
 CREATE TABLE Users (
     user_id       INT PRIMARY KEY IDENTITY(1,1),
     roll_number   VARCHAR(20) UNIQUE,
-    full_name     VARCHAR(100) NOT NULL,
+    first_name    VARCHAR(50) NOT NULL,
+    last_name     VARCHAR(50) NOT NULL,
     email         VARCHAR(100) UNIQUE,
     phone         VARCHAR(20),
     role          VARCHAR(20) DEFAULT 'student' CHECK (role IN ('student', 'admin', 'organizer')),
@@ -54,9 +55,7 @@ CREATE TABLE Sports_Items (
     item_name     VARCHAR(100) NOT NULL,
     sport_id      INT,
     total_qty     INT NOT NULL DEFAULT 0,
-    available_qty INT NOT NULL DEFAULT 0,
-    FOREIGN KEY (sport_id) REFERENCES Sports(sport_id),
-    CONSTRAINT chk_qty CHECK (available_qty >= 0 AND available_qty <= total_qty)
+    FOREIGN KEY (sport_id) REFERENCES Sports(sport_id)
 );
 
 -- 6. ITEM ISSUANCE
@@ -142,14 +141,15 @@ CREATE TABLE Matches (
 -- 12. PLAYER PROFILES
 CREATE TABLE Player_Profiles (
     profile_id    INT PRIMARY KEY IDENTITY(1,1),
-    user_id       INT UNIQUE NOT NULL,
+    user_id       INT NOT NULL,
     sport_id      INT NOT NULL,
     skill_level   VARCHAR(20) DEFAULT 'beginner' CHECK (skill_level IN ('beginner', 'intermediate', 'advanced', 'pro')),
     position      VARCHAR(50),
     is_available  BIT DEFAULT 1,
     bio           TEXT,
     FOREIGN KEY (user_id)  REFERENCES Users(user_id),
-    FOREIGN KEY (sport_id) REFERENCES Sports(sport_id)
+    FOREIGN KEY (sport_id) REFERENCES Sports(sport_id),
+    CONSTRAINT unique_player_sport UNIQUE (user_id, sport_id)
 );
 
 -- ============================================================
@@ -163,17 +163,17 @@ INSERT INTO Sports (sport_name, max_team_size, min_team_size) VALUES
 ('Cricket',    11, 8);
 
 -- Users
-INSERT INTO Users (roll_number, full_name, email, phone, role) VALUES
-('L24-2557', 'Azan Wasty',    'azan.wasty@nu.edu.pk',    '03001111111', 'student'),
-('L24-2540', 'Mahareb Ammar', 'mahareb.ammar@nu.edu.pk', '03002222222', 'student'),
-('L24-2579', 'Ali Naveed',    'ali.naveed@nu.edu.pk',    '03003333333', 'student'),
-('L24-2606', 'Saaif Suleman', 'saaif.suleman@nu.edu.pk', '03004444444', 'student'),
-('A00-0001',  'Sports Admin', 'sports.admin@nu.edu.pk',  '03005555555', 'admin'),
-('L24-2600', 'Hamza Raza',    'hamza.raza@nu.edu.pk',    '03006666666', 'student'),
-('L24-2601', 'Sara Khan',     'sara.khan@nu.edu.pk',     '03007777777', 'student'),
-('L24-2602', 'Bilal Tariq',   'bilal.tariq@nu.edu.pk',   '03008888888', 'student'),
-('L24-2603', 'Fatima Malik',  'fatima.malik@nu.edu.pk',  '03009999999', 'student'),
-('L24-2604', 'Usman Ghani',   'usman.ghani@nu.edu.pk',   '03011111111', 'organizer');
+INSERT INTO Users (roll_number, first_name, last_name, email, phone, role) VALUES
+('L24-2557', 'Azan', 'Wasty',    'azan.wasty@nu.edu.pk',    '03001111111', 'student'),
+('L24-2540', 'Mahareb', 'Ammar', 'mahareb.ammar@nu.edu.pk', '03002222222', 'student'),
+('L24-2579', 'Ali', 'Naveed',    'ali.naveed@nu.edu.pk',    '03003333333', 'student'),
+('L24-2606', 'Saaif', 'Suleman', 'saaif.suleman@nu.edu.pk', '03004444444', 'student'),
+('A00-0001', 'Sports', 'Admin',  'sports.admin@nu.edu.pk',  '03005555555', 'admin'),
+('L24-2600', 'Hamza', 'Raza',    'hamza.raza@nu.edu.pk',    '03006666666', 'student'),
+('L24-2601', 'Sara', 'Khan',     'sara.khan@nu.edu.pk',     '03007777777', 'student'),
+('L24-2602', 'Bilal', 'Tariq',   'bilal.tariq@nu.edu.pk',   '03008888888', 'student'),
+('L24-2603', 'Fatima', 'Malik',  'fatima.malik@nu.edu.pk',  '03009999999', 'student'),
+('L24-2604', 'Usman', 'Ghani',   'usman.ghani@nu.edu.pk',   '03011111111', 'organizer');
 
 -- Venues
 INSERT INTO Venues (venue_name, sport_id, location, capacity, is_available) VALUES
@@ -182,11 +182,11 @@ INSERT INTO Venues (venue_name, sport_id, location, capacity, is_available) VALU
 ('Main Cricket Pitch',      3, 'Block B Grounds', 22, 1);
 
 -- Sports Items
-INSERT INTO Sports_Items (item_name, sport_id, total_qty, available_qty) VALUES
-('Football',     1, 10,  8),
-('Basketball',   2,  8,  6),
-('Cricket Bat',  3, 12, 10),
-('Cricket Ball', 3, 20, 17);
+INSERT INTO Sports_Items (item_name, sport_id, total_qty) VALUES
+('Football',     1, 10),
+('Basketball',   2,  8),
+('Cricket Bat',  3, 12),
+('Cricket Ball', 3, 20);
 
 -- Teams
 INSERT INTO Teams (team_name, sport_id, captain_id) VALUES
@@ -277,7 +277,8 @@ INSERT INTO Player_Profiles (user_id, sport_id, skill_level, position, is_availa
 -- Q1: View all confirmed court bookings with user and venue/sport details
 SELECT
     cr.booking_id,
-    u.full_name,
+    u.first_name,
+    u.last_name,
     u.roll_number,
     v.venue_name,
     s.sport_name,
@@ -294,7 +295,8 @@ ORDER BY cr.booking_date, cr.start_time;
 
 -- Q2: Search available players for Football
 SELECT
-    u.full_name,
+    u.first_name,
+    u.last_name,
     u.roll_number,
     pp.skill_level,
     pp.position,
@@ -307,7 +309,8 @@ WHERE s.sport_name = 'Football' AND pp.is_available = 1;
 -- Q3: View all teams and their members for Basketball
 SELECT
     t.team_name,
-    u.full_name,
+    u.first_name,
+    u.last_name,
     u.roll_number
 FROM Teams t
 JOIN Team_Members tm ON t.team_id  = tm.team_id
@@ -319,7 +322,7 @@ WHERE s.sport_name = 'Basketball';
 SELECT
     t.team_id,
     t.team_name,
-    u.full_name AS captain_name
+    u.first_name + ' ' + u.last_name AS captain_name
 FROM Teams t
 JOIN Users u ON t.captain_id = u.user_id
 WHERE t.sport_id = 1 AND t.team_id <> 1;
@@ -327,7 +330,8 @@ WHERE t.sport_id = 1 AND t.team_id <> 1;
 -- Q5: All currently unreturned items (issued or overdue)
 SELECT
     ii.issuance_id,
-    u.full_name,
+    u.first_name,
+    u.last_name,
     u.roll_number,
     si.item_name,
     ii.quantity,
@@ -344,7 +348,7 @@ ORDER BY ii.due_date;
 SELECT
     t.name AS tournament_name,
     tm.team_name,
-    u.full_name AS captain,
+    u.first_name + ' ' + u.last_name AS captain,
     tr.status
 FROM Tournament_Registrations tr
 JOIN Tournaments t  ON tr.tournament_id = t.tournament_id
@@ -369,11 +373,13 @@ WHERE m.status = 'completed';
 SELECT
     si.item_name,
     si.total_qty,
-    si.available_qty,
-    (si.total_qty - si.available_qty) AS currently_issued
+    (si.total_qty - ISNULL(SUM(ii.quantity), 0)) AS available_qty,
+    ISNULL(SUM(ii.quantity), 0) AS currently_issued
 FROM Sports_Items si
 JOIN Sports s ON si.sport_id = s.sport_id
-WHERE s.sport_name = 'Cricket';
+LEFT JOIN Item_Issuance ii ON si.item_id = ii.item_id AND ii.status IN ('issued', 'overdue')
+WHERE s.sport_name = 'Cricket'
+GROUP BY si.item_id, si.item_name, si.total_qty;
 
 -- ----- UPDATE -----
 
@@ -387,10 +393,8 @@ UPDATE Item_Issuance
 SET status = 'returned', returned_at = GETDATE()
 WHERE issuance_id = 3;
 
--- U3: Restore available quantity after item return
-UPDATE Sports_Items
-SET available_qty = available_qty + 1
-WHERE item_id = 4;
+-- U3: Restore available quantity after item return (REMOVED: derived attribute)
+-- UPDATE Sports_Items SET available_qty = available_qty + 1 WHERE item_id = 4;
 
 -- U4: Approve a proposed tournament
 UPDATE Tournaments

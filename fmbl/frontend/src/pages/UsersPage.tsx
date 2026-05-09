@@ -31,7 +31,7 @@ export default function UsersPage() {
   }
 
   const displayed = data.filter(u => 
-    u.full_name.toLowerCase().includes(search.toLowerCase()) ||
+    `${u.first_name} ${u.last_name}`.toLowerCase().includes(search.toLowerCase()) ||
     u.roll_number.toLowerCase().includes(search.toLowerCase()) ||
     u.email.toLowerCase().includes(search.toLowerCase())
   )
@@ -76,9 +76,9 @@ export default function UsersPage() {
                   <td>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                       <div className="player-avatar" style={{ width: 32, height: 32, fontSize: '0.8rem' }}>
-                        {u.full_name.charAt(0)}
+                        {`${u.first_name} ${u.last_name}`.charAt(0)}
                       </div>
-                      <span className="fw-600">{u.full_name}</span>
+                      <span className="fw-600">{`${u.first_name} ${u.last_name}`}</span>
                     </div>
                   </td>
                   <td><code style={{ fontSize: '0.8rem' }}>{u.roll_number}</code></td>

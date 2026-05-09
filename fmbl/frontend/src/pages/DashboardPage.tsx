@@ -61,7 +61,7 @@ export default function DashboardPage() {
           <div className="dash-banner-blob" />
           <div>
             <p className="dash-banner-greeting">Good {greeting()},</p>
-            <h1 className="dash-banner-name">{user?.full_name}</h1>
+            <h1 className="dash-banner-name">{`${user?.first_name} ${user?.last_name}`}</h1>
             <p className="dash-banner-meta">{user?.roll_number} · <span className="dash-role-tag">{user?.role}</span></p>
           </div>
           <div className="dash-banner-icon"><TrendingUp size={48} strokeWidth={1.2} /></div>

@@ -8,7 +8,7 @@ const getAllBookings = async (req, res) => {
 
         const request = pool.request();
         let query = `
-            SELECT cr.booking_id, u.full_name, u.roll_number,
+            SELECT cr.booking_id, u.first_name, u.last_name, u.roll_number,
                    v.venue_name, s.sport_name,
                    cr.booking_date, cr.start_time, cr.end_time, cr.status, cr.created_at
             FROM Court_Registrations cr
@@ -35,7 +35,7 @@ const getBookingById = async (req, res) => {
         const pool = await poolPromise;
         const result = await pool.request()
             .input('id', sql.Int, req.params.id)
-            .query(`SELECT cr.*, u.full_name, v.venue_name
+            .query(`SELECT cr.*, u.first_name, u.last_name, v.venue_name
                     FROM Court_Registrations cr
                     JOIN Users  u ON cr.user_id  = u.user_id
                     JOIN Venues v ON cr.venue_id = v.venue_id
@@ -53,8 +53,40 @@ const createBooking = async (req, res) => {
     if (!user_id || !venue_id || !booking_date || !start_time || !end_time)
         return res.status(400).json({ error: 'user_id, venue_id, booking_date, start_time, end_time required' });
 
+    // Validate booking is for today
+    const today = new Date().toISOString().split('T')[0];
+    if (booking_date !== today) {
+        return res.status(400).json({ error: 'Bookings can only be made for today.' });
+    }
+
+    // Validate booking time is between 9 AM and 5 PM
+    if (start_time < '09:00' || end_time > '17:00' || start_time >= end_time) {
+        return res.status(400).json({ error: 'Bookings must be between 09:00 and 17:00, and start time must be before end time.' });
+    }
+
+    // Enforce exactly 1 hour slot
+    const startHour = parseInt(start_time.split(':')[0], 10);
+    const startMinute = parseInt(start_time.split(':')[1], 10);
+    const endHour = parseInt(end_time.split(':')[0], 10);
+    const endMinute = parseInt(end_time.split(':')[1], 10);
+    if (endHour - startHour !== 1 || startMinute !== 0 || endMinute !== 0) {
+        return res.status(400).json({ error: 'Only exactly 1-hour slots starting on the hour (e.g. 09:00 to 10:00) are allowed.' });
+    }
+
     try {
         const pool = await poolPromise;
+
+        // Check if user already booked today
+        const userQuota = await pool.request()
+            .input('user_id', sql.Int, user_id)
+            .input('booking_date', sql.Date, booking_date)
+            .query(`SELECT booking_id FROM Court_Registrations 
+                    WHERE user_id = @user_id 
+                      AND booking_date = @booking_date 
+                      AND status <> 'cancelled'`);
+        if (userQuota.recordset.length > 0) {
+            return res.status(409).json({ error: 'You are only allowed one court booking per day.' });
+        }
 
         // Check for time-slot conflict
         const conflict = await pool.request()

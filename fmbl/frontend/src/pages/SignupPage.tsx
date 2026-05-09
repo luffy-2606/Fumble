@@ -13,7 +13,9 @@ export default function SignupPage() {
   const [error, setError] = useState('')
 
   const [rollNumber, setRollNumber] = useState('')
-  const [fullName, setFullName] = useState('')
+  const [firstName, setFirstName] = useState('')
+  const [lastName, setLastName] = useState('')
+  const [role, setRole] = useState('student')
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
   const [password, setPassword] = useState('')
@@ -28,7 +30,7 @@ export default function SignupPage() {
   async function handleSignup(e: FormEvent) {
     e.preventDefault()
     const normalizedEmail = email.trim().toLowerCase()
-    if (!rollNumber || !fullName || !normalizedEmail || !password) {
+    if (!rollNumber || !firstName || !lastName || !normalizedEmail || !password) {
       setError('Please fill in all required fields.')
       return
     }
@@ -50,15 +52,18 @@ export default function SignupPage() {
     try {
       const data = await authApi.register({
         roll_number: rollNumber.trim(),
-        full_name: fullName.trim(),
+        first_name: firstName.trim(),
+        last_name: lastName.trim(),
         email: normalizedEmail,
         phone: phone.trim() || undefined,
+        role: role,
         password,
       })
       const meUser: MeUser = {
         user_id: data.user_id,
         roll_number: data.roll_number,
-        full_name: data.full_name,
+        first_name: data.first_name,
+        last_name: data.last_name,
         email: data.email,
         role: data.role,
       }
@@ -106,18 +111,44 @@ export default function SignupPage() {
                 required
               />
             </div>
-            <div className="form-group">
-              <label className="form-label" htmlFor="s-name">Full Name <span className="req">*</span></label>
-              <input
-                id="s-name"
-                className="form-input"
-                type="text"
-                placeholder="Your name"
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                required
-              />
+            <div className="form-group" style={{ display: 'flex', gap: 8 }}>
+              <div style={{ flex: 1 }}>
+                <label className="form-label" htmlFor="s-fname">First Name <span className="req">*</span></label>
+                <input
+                  id="s-fname"
+                  className="form-input"
+                  type="text"
+                  placeholder="First"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  required
+                />
+              </div>
+              <div style={{ flex: 1 }}>
+                <label className="form-label" htmlFor="s-lname">Last Name <span className="req">*</span></label>
+                <input
+                  id="s-lname"
+                  className="form-input"
+                  type="text"
+                  placeholder="Last"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  required
+                />
+              </div>
             </div>
+          </div>
+          <div className="form-group">
+            <label className="form-label" htmlFor="s-role">Register As</label>
+            <select 
+              id="s-role" 
+              className="form-input" 
+              value={role} 
+              onChange={(e) => setRole(e.target.value)}
+            >
+              <option value="student">Student</option>
+              <option value="organizer">Organizer</option>
+            </select>
           </div>
           <div className="form-group">
             <label className="form-label" htmlFor="s-email">Email <span className="req">*</span></label>

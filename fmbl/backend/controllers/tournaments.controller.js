@@ -9,7 +9,7 @@ const getAllTournaments = async (req, res) => {
         const request = pool.request();
         let query = `
             SELECT t.tournament_id, t.name, s.sport_name,
-                   u.full_name AS organizer_name, v.venue_name,
+                   (u.first_name + ' ' + u.last_name) AS organizer_name, v.venue_name,
                    t.start_date, t.end_date, t.status
             FROM Tournaments t
             JOIN Sports s ON t.sport_id     = s.sport_id
@@ -34,7 +34,7 @@ const getTournamentById = async (req, res) => {
         const pool = await poolPromise;
         const tourney = await pool.request()
             .input('id', sql.Int, req.params.id)
-            .query(`SELECT t.*, s.sport_name, u.full_name AS organizer_name, v.venue_name
+            .query(`SELECT t.*, s.sport_name, (u.first_name + ' ' + u.last_name) AS organizer_name, v.venue_name
                     FROM Tournaments t
                     JOIN Sports s ON t.sport_id     = s.sport_id
                     JOIN Users  u ON t.organizer_id = u.user_id

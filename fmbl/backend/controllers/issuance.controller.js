@@ -8,7 +8,7 @@ const getAllIssuances = async (req, res) => {
 
         const request = pool.request();
         let query = `
-            SELECT ii.issuance_id, u.full_name, u.roll_number,
+            SELECT ii.issuance_id, u.first_name, u.last_name, u.roll_number,
                    si.item_name, ii.quantity,
                    ii.issued_at, ii.due_date, ii.returned_at, ii.status
             FROM Item_Issuance ii
@@ -34,7 +34,7 @@ const getIssuanceById = async (req, res) => {
         const pool = await poolPromise;
         const result = await pool.request()
             .input('id', sql.Int, req.params.id)
-            .query(`SELECT ii.*, u.full_name, si.item_name
+            .query(`SELECT ii.*, u.first_name, u.last_name, si.item_name
                     FROM Item_Issuance ii
                     JOIN Users        u  ON ii.user_id = u.user_id
                     JOIN Sports_Items si ON ii.item_id = si.item_id
@@ -60,7 +60,12 @@ const issueItem = async (req, res) => {
         // check available stock
         const stockCheck = await pool.request()
             .input('item_id', sql.Int, item_id)
-            .query('SELECT available_qty, item_name FROM Sports_Items WHERE item_id = @item_id');
+            .query(`SELECT si.total_qty, si.item_name,
+                           (si.total_qty - ISNULL(SUM(ii.quantity), 0)) AS available_qty
+                    FROM Sports_Items si
+                    LEFT JOIN Item_Issuance ii ON si.item_id = ii.item_id AND ii.status IN ('issued', 'overdue')
+                    WHERE si.item_id = @item_id
+                    GROUP BY si.item_id, si.item_name, si.total_qty`);
 
         if (!stockCheck.recordset.length) {
             return res.status(404).json({ error: 'Item not found' });
@@ -73,11 +78,7 @@ const issueItem = async (req, res) => {
             });
         }
 
-        // Decrease available_qty
-        await pool.request()
-            .input('qty', sql.Int, qty)
-            .input('item_id', sql.Int, item_id)
-            .query('UPDATE Sports_Items SET available_qty = available_qty - @qty WHERE item_id = @item_id');
+        // We don't decrease available_qty anymore because it's dynamically calculated.
 
         const result = await pool.request()
             .input('user_id', sql.Int, user_id)
@@ -105,11 +106,7 @@ const returnItem = async (req, res) => {
         const { item_id, quantity, status } = fetch.recordset[0];
         if (status === 'returned') return res.status(400).json({ error: 'Already returned' });
 
-        // Restore available_qty
-        await pool.request()
-            .input('qty', sql.Int, quantity)
-            .input('item_id', sql.Int, item_id)
-            .query('UPDATE Sports_Items SET available_qty = available_qty + @qty WHERE item_id = @item_id');
+        // We don't restore available_qty manually anymore.
 
         const result = await pool.request()
             .input('id', sql.Int, req.params.id)

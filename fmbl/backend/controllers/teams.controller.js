@@ -7,7 +7,7 @@ const getAllTeams = async (req, res) => {
         const { sport_id } = req.query;
         let query = `
             SELECT t.team_id, t.team_name, s.sport_name,
-                   u.full_name AS captain_name, u.roll_number AS captain_roll, t.created_at
+                   (u.first_name + ' ' + u.last_name) AS captain_name, u.roll_number AS captain_roll, t.created_at
             FROM Teams t
             JOIN Sports s ON t.sport_id   = s.sport_id
             JOIN Users  u ON t.captain_id = u.user_id`;
@@ -25,7 +25,7 @@ const getTeamById = async (req, res) => {
         const pool = await poolPromise;
         const team = await pool.request()
             .input('id', sql.Int, req.params.id)
-            .query(`SELECT t.*, s.sport_name, u.full_name AS captain_name
+            .query(`SELECT t.*, s.sport_name, (u.first_name + ' ' + u.last_name) AS captain_name
                     FROM Teams t
                     JOIN Sports s ON t.sport_id   = s.sport_id
                     JOIN Users  u ON t.captain_id = u.user_id
@@ -128,7 +128,7 @@ const getOpponents = async (req, res) => {
         const result = await pool.request()
             .input('sport_id', sql.Int, req.params.sport_id)
             .input('team_id', sql.Int, req.params.team_id)
-            .query(`SELECT t.team_id, t.team_name, u.full_name AS captain_name
+            .query(`SELECT t.team_id, t.team_name, (u.first_name + ' ' + u.last_name) AS captain_name
                     FROM Teams t
                     JOIN Users u ON t.captain_id = u.user_id
                     WHERE t.sport_id = @sport_id AND t.team_id <> @team_id`);

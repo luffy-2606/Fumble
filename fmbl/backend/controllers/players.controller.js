@@ -8,7 +8,7 @@ const getAllPlayers = async (req, res) => {
 
         const request = pool.request();
         let query = `
-            SELECT pp.profile_id, u.full_name, u.roll_number, u.email,
+            SELECT pp.profile_id, u.first_name, u.last_name, u.roll_number, u.email,
                    s.sport_name, pp.skill_level, pp.position, pp.is_available, pp.bio
             FROM Player_Profiles pp
             JOIN Users  u ON pp.user_id  = u.user_id
@@ -36,7 +36,7 @@ const getPlayerById = async (req, res) => {
         const pool = await poolPromise;
         const result = await pool.request()
             .input('id', sql.Int, req.params.id)
-            .query(`SELECT pp.*, u.full_name, u.roll_number, u.email, s.sport_name
+            .query(`SELECT pp.*, u.first_name, u.last_name, u.roll_number, u.email, s.sport_name
                     FROM Player_Profiles pp
                     JOIN Users  u ON pp.user_id  = u.user_id
                     JOIN Sports s ON pp.sport_id = s.sport_id
