@@ -1,0 +1,14 @@
+$kind: http-request
+method: POST
+url: '{{baseUrl}}/api/auth/login'
+order: 2000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "roll_number": "21L-1234",
+      "password": "Secret123!"
+    }

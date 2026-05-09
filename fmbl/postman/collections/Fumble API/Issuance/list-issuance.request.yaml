@@ -1,0 +1,7 @@
+$kind: http-request
+method: GET
+url: '{{baseUrl}}/api/issuance'
+order: 1000
+queryParams:
+  - key: status
+    value: issued

@@ -1,0 +1,9 @@
+$kind: collection
+name: 'Fumble API'
+variables:
+  - key: baseUrl
+    value: 'http://localhost:{{port}}'
+  - key: port
+    value: '5000'
+  - key: token
+    value: ''

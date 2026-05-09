@@ -1,0 +1,9 @@
+$kind: http-request
+method: GET
+url: '{{baseUrl}}/api/teams/opponents/:sport_id/:team_id'
+order: 7000
+pathVariables:
+  - key: sport_id
+    value: '1'
+  - key: team_id
+    value: '1'

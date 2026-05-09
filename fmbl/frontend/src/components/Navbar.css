@@ -1,0 +1,116 @@
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--gray-200);
+  box-shadow: 0 1px 8px rgba(33, 150, 243, 0.06);
+}
+
+.navbar-inner {
+  display: flex;
+  align-items: center;
+  height: 60px;
+  gap: 16px;
+}
+
+.navbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+.brand-text {
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: -0.3px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.navbar-links {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex: 1;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.navbar-links::-webkit-scrollbar { display: none; }
+
+.nav-link {
+  padding: 5px 11px;
+  border-radius: var(--radius-md);
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--gray-600);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: all var(--transition);
+}
+.nav-link:hover { color: var(--primary); background: var(--primary-pale); }
+.nav-link.active { color: var(--primary-dark); background: var(--primary-pale); font-weight: 700; }
+
+.navbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.navbar-user {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--gray-600);
+  padding: 4px 10px;
+  background: var(--gray-100);
+  border-radius: 20px;
+}
+
+.btn-sm { padding: 6px 14px; font-size: 0.8rem; }
+
+.btn-hamburger {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1.5px solid var(--gray-200);
+  border-radius: var(--radius-sm);
+  padding: 5px 7px;
+  cursor: pointer;
+  color: var(--gray-600);
+  transition: all var(--transition);
+}
+.btn-hamburger:hover { background: var(--gray-100); }
+
+.navbar-drawer {
+  display: none;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 20px 16px;
+  border-top: 1px solid var(--gray-100);
+  background: white;
+}
+.navbar-drawer .nav-link { font-size: 0.9rem; padding: 8px 14px; }
+
+@media (max-width: 900px) {
+  .navbar-links { display: none; }
+  .btn-hamburger { display: flex; }
+  .navbar-drawer { display: flex; }
+}
+
+@media (max-width: 480px) {
+  .navbar-user { display: none; }
+}

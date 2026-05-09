@@ -1,0 +1,16 @@
+$kind: http-request
+method: POST
+url: '{{baseUrl}}/api/venues'
+order: 3000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "venue_name": "Main Sports Hall",
+      "sport_id": 1,
+      "location": "Campus Block A",
+      "capacity": 200
+    }

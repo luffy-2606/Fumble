@@ -1,0 +1,18 @@
+$kind: http-request
+method: POST
+url: '{{baseUrl}}/api/tournaments'
+order: 3000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "name": "Spring Championship",
+      "sport_id": 1,
+      "organizer_id": 1,
+      "start_date": "2026-05-01",
+      "end_date": "2026-05-10",
+      "venue_id": 1
+    }

@@ -1,0 +1,7 @@
+$kind: http-request
+method: GET
+url: '{{baseUrl}}/api/matches'
+order: 1000
+queryParams:
+  - key: tournament_id
+    value: '1'

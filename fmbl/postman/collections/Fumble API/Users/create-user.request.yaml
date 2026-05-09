@@ -1,0 +1,19 @@
+$kind: http-request
+method: POST
+url: '{{baseUrl}}/api/users'
+order: 3000
+headers:
+  - key: Authorization
+    value: 'Bearer {{token}}'
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "roll_number": "A00-0002",
+      "full_name": "Admin Created User",
+      "email": "created.user@example.com",
+      "phone": "03111222333",
+      "role": "student"
+    }

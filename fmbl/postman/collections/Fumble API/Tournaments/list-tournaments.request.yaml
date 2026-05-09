@@ -1,0 +1,7 @@
+$kind: http-request
+method: GET
+url: '{{baseUrl}}/api/tournaments'
+order: 1000
+queryParams:
+  - key: status
+    value: approved

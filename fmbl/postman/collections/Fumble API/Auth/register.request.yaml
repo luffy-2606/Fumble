@@ -1,0 +1,18 @@
+$kind: http-request
+method: POST
+url: '{{baseUrl}}/api/auth/register'
+order: 1000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "roll_number": "21L-1234",
+      "full_name": "Ali Khan",
+      "email": "ali.khan@example.com",
+      "phone": "03001234567",
+      "role": "student",
+      "password": "Secret123!"
+    }

@@ -1,0 +1,23 @@
+$kind: http-request
+name: http://localhost:5000/api/issuance
+url: http://localhost:5000/api/issuance
+method: GET
+headers:
+  Authorization: Bearer
+    eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc3NjEwMDY1NywiZXhwIjoxNzc4NjkyNjU3fQ.8CrPVw2ANPmsaZFfEuwG1KeQmrkYGJHAaLPMLSVhUfc
+body:
+  type: json
+  content: "{\r
+
+    \  \"roll_number\": \"24L-9999\",\r
+
+    \  \"full_name\": \"Admin User\",\r
+
+    \  \"email\": \"admin@test.com\",\r
+
+    \  \"password\": \"test123\",\r
+
+    \  \"role\": \"admin\"\r
+
+    }"
+order: 3308221011853311

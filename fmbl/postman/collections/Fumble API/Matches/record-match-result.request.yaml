@@ -1,0 +1,18 @@
+$kind: http-request
+method: PATCH
+url: '{{baseUrl}}/api/matches/:id/result'
+order: 5000
+headers:
+  - key: Content-Type
+    value: application/json
+pathVariables:
+  - key: id
+    value: '1'
+body:
+  type: json
+  content: |-
+    {
+      "winner_team_id": 1,
+      "score_team1": 3,
+      "score_team2": 1
+    }

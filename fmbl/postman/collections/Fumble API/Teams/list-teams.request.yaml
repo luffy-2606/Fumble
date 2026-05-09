@@ -1,0 +1,7 @@
+$kind: http-request
+method: GET
+url: '{{baseUrl}}/api/teams'
+order: 1000
+queryParams:
+  - key: sport_id
+    value: '1'

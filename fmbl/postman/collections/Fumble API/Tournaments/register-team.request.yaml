@@ -1,0 +1,16 @@
+$kind: http-request
+method: POST
+url: '{{baseUrl}}/api/tournaments/:id/register'
+order: 5000
+headers:
+  - key: Content-Type
+    value: application/json
+pathVariables:
+  - key: id
+    value: '1'
+body:
+  type: json
+  content: |-
+    {
+      "team_id": 1
+    }

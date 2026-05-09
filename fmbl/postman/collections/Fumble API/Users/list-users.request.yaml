@@ -1,0 +1,7 @@
+$kind: http-request
+method: GET
+url: '{{baseUrl}}/api/users'
+order: 1000
+headers:
+  - key: Authorization
+    value: 'Bearer {{token}}'

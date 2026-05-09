@@ -1,0 +1,16 @@
+$kind: http-request
+method: POST
+url: '{{baseUrl}}/api/issuance'
+order: 3000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "user_id": 1,
+      "item_id": 1,
+      "quantity": 1,
+      "due_date": "2026-04-20"
+    }

@@ -1,0 +1,15 @@
+$kind: http-request
+method: POST
+url: '{{baseUrl}}/api/sports'
+order: 3000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "sport_name": "Football",
+      "max_team_size": 11,
+      "min_team_size": 7
+    }

@@ -1,0 +1,7 @@
+$kind: http-request
+method: GET
+url: '{{baseUrl}}/api/tournaments/:id'
+order: 2000
+pathVariables:
+  - key: id
+    value: '1'

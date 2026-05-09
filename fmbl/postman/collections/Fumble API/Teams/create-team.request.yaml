@@ -1,0 +1,15 @@
+$kind: http-request
+method: POST
+url: '{{baseUrl}}/api/teams'
+order: 3000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "team_name": "Fumble Falcons",
+      "sport_id": 1,
+      "captain_id": 1
+    }

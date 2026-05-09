@@ -1,0 +1,18 @@
+$kind: http-request
+method: PUT
+url: '{{baseUrl}}/api/players/:id'
+order: 4000
+headers:
+  - key: Content-Type
+    value: application/json
+pathVariables:
+  - key: id
+    value: '1'
+body:
+  type: json
+  content: |-
+    {
+      "team_id": 2,
+      "jersey_number": 11,
+      "position": "Midfielder"
+    }

@@ -1,0 +1,16 @@
+$kind: http-request
+method: POST
+url: '{{baseUrl}}/api/items'
+order: 3000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "item_name": "Football",
+      "sport_id": 1,
+      "total_qty": 20,
+      "available_qty": 20
+    }
