@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import Shuffle from '../components/Shuffle'
 import { Trophy, Users, Calendar, MapPin, ArrowRight, Shield } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import './HomePage.css'
@@ -18,8 +19,41 @@ export default function HomePage() {
             <span>University Sports Platform</span>
           </div>
           <h1 className="hero-title">
-            Your Campus.<br />
-            <span className="hero-title-accent">Your Game.</span>
+            <Shuffle
+              text="Your Campus."
+              shuffleDirection="right"
+              duration={0.35}
+              animationMode="evenodd"
+              shuffleTimes={1}
+              ease="power3.out"
+              stagger={0.03}
+              threshold={0.1}
+              triggerOnce={true}
+              triggerOnHover
+              respectReducedMotion={true}
+              loop={false}
+              loopDelay={0}
+              tag="span"
+              style={{ display: 'block' }}
+            />
+            <Shuffle
+              text="Your Game."
+              shuffleDirection="right"
+              duration={0.35}
+              animationMode="evenodd"
+              shuffleTimes={1}
+              ease="power3.out"
+              stagger={0.03}
+              threshold={0.1}
+              triggerOnce={true}
+              triggerOnHover
+              respectReducedMotion={true}
+              loop={false}
+              loopDelay={0}
+              tag="span"
+              className="hero-title-accent"
+              style={{ display: 'block' }}
+            />
           </h1>
           <p className="hero-subtitle">
             Fumble brings together FAST-NUCES athletes, teams, and tournaments in one streamlined platform.

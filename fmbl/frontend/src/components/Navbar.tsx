@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { Trophy, LogOut, Menu, X, LayoutDashboard, LogIn, UserPlus } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
+import ThemeToggle from './ThemeToggle'
 import './Navbar.css'
 
 const NAV_LINKS = [
@@ -54,6 +55,7 @@ export default function Navbar() {
 
         {/* Desktop auth actions */}
         <div className="navbar-actions">
+          <ThemeToggle />
           {isAuthenticated ? (
             <>
               <span className="navbar-user">
