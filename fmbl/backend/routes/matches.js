@@ -6,13 +6,17 @@ const {
     updateMatchResult,
     deleteMatch,
 } = require('../controllers/matches.controller');
+const { protect, authorize } = require('../middleware/auth.middleware');
 
 const router = express.Router();
 
+// All routes require login
+router.use(protect);
+
 router.get('/', getAllMatches);
-router.post('/', createMatch);
-router.patch('/:id/result', updateMatchResult);
+router.post('/', createMatch);                                        // students + admin
+router.patch('/:id/result', authorize('admin'), updateMatchResult);  // admin only
 router.get('/:id', getMatchById);
-router.delete('/:id', deleteMatch);
+router.delete('/:id', authorize('admin'), deleteMatch);              // admin only
 
 module.exports = router;

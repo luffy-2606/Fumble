@@ -82,10 +82,16 @@ export const playersApi = {
 export interface Team {
   team_id: number; team_name: string; sport_name: string
   captain_name: string; captain_roll: string; created_at: string
+  status: string
 }
 export const teamsApi = {
-  list: () => api.get<Team[]>('/api/teams').then(r => r.data),
+  list: (status?: string) => api.get<Team[]>('/api/teams', { params: status ? { status } : {} }).then(r => r.data),
   get: (id: number) => api.get<Team>(`/api/teams/${id}`).then(r => r.data),
+  create: (data: { team_name: string; sport_id: number; captain_id: number }) =>
+    api.post<Team>('/api/teams', data).then(r => r.data),
+  approve: (id: number, status: string) =>
+    api.patch(`/api/teams/${id}/approve`, { status }).then(r => r.data),
+  delete: (id: number) => api.delete(`/api/teams/${id}`).then(r => r.data),
 }
 
 // ─── Courts ───────────────────────────────────────────────────────────────────

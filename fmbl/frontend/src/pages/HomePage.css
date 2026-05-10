@@ -11,6 +11,10 @@
   padding: 96px 0 80px;
 }
 
+[data-theme="dark"] .hero-section {
+  background: linear-gradient(160deg, #0f172a 0%, #162032 55%);
+}
+
 .hero-bg-blob {
   position: absolute;
   border-radius: 50%;
@@ -169,7 +173,7 @@
   width: 52px;
   height: 52px;
   border-radius: var(--radius-md);
-  background: var(--gray-50);
+  background: var(--bg-muted);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -241,7 +245,7 @@
 
 /* Footer */
 .home-footer {
-  border-top: 1px solid var(--gray-200);
+  border-top: 1px solid var(--border);
   padding: 24px;
   text-align: center;
   font-size: 0.82rem;

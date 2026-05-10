@@ -46,15 +46,18 @@ const createMatch = async (req, res) => {
     if (team_a_id === team_b_id) return res.status(400).json({ error: 'Teams must be different' });
     try {
         const pool = await poolPromise;
+        // Admin-created matches are 'scheduled'; student-created need approval
+        const initialStatus = req.user?.role === 'admin' ? 'scheduled' : 'pending_approval';
         const result = await pool.request()
             .input('tournament_id', sql.Int, tournament_id)
             .input('team_a_id', sql.Int, team_a_id)
             .input('team_b_id', sql.Int, team_b_id)
             .input('match_date', sql.Date, match_date)
             .input('match_time', sql.VarChar, match_time)
-            .query(`INSERT INTO Matches (tournament_id, team_a_id, team_b_id, match_date, match_time)
+            .input('status', sql.VarChar, initialStatus)
+            .query(`INSERT INTO Matches (tournament_id, team_a_id, team_b_id, match_date, match_time, status)
                     OUTPUT INSERTED.*
-                    VALUES (@tournament_id, @team_a_id, @team_b_id, @match_date, @match_time)`);
+                    VALUES (@tournament_id, @team_a_id, @team_b_id, @match_date, @match_time, @status)`);
         res.status(201).json(result.recordset[0]);
     } catch (err) {
         res.status(500).json({ error: err.message });

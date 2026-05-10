@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Trophy, Calendar, User, Users, MapPin, Package, ClipboardList, ChevronRight, TrendingUp } from 'lucide-react'
+import { Trophy, Calendar, User, Users, MapPin, Package, ClipboardList, ChevronRight, TrendingUp, AlertTriangle } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import {
   tournamentsApi, matchesApi, playersApi, teamsApi,
@@ -23,19 +23,44 @@ export default function DashboardPage() {
   const [items, setItems]             = useState<Item[]>([])
   const [issuances, setIssuances]     = useState<Issuance[]>([])
   const [loading, setLoading]         = useState(true)
+  const [error, setError]             = useState(false)
 
   useEffect(() => {
-    Promise.all([
-      tournamentsApi.list(), matchesApi.list(), playersApi.list(), teamsApi.list(),
-      courtsApi.list(), itemsApi.list(), issuanceApi.list(),
-    ]).then(([t, m, p, tm, b, it, is]) => {
-      setTournaments(t); setMatches(m); setPlayers(p); setTeams(tm)
-      setBookings(b); setItems(it); setIssuances(is)
-    }).catch(() => {}).finally(() => setLoading(false))
+    // Fetch each independently so one failure doesn't break everything
+    const fetchAll = async () => {
+      setLoading(true)
+      try {
+        const results = await Promise.allSettled([
+          tournamentsApi.list(), 
+          matchesApi.list(), 
+          playersApi.list(), 
+          teamsApi.list(),
+          courtsApi.list(), 
+          itemsApi.list(), 
+          issuanceApi.list(),
+        ])
+
+        if (results[0].status === 'fulfilled') setTournaments(results[0].value)
+        if (results[1].status === 'fulfilled') setMatches(results[1].value)
+        if (results[2].status === 'fulfilled') setPlayers(results[2].value)
+        if (results[3].status === 'fulfilled') setTeams(results[3].value)
+        if (results[4].status === 'fulfilled') setBookings(results[4].value)
+        if (results[5].status === 'fulfilled') setItems(results[5].value)
+        if (results[6].status === 'fulfilled') setIssuances(results[6].value)
+
+        // If all failed, show error
+        if (results.every(r => r.status === 'rejected')) setError(true)
+      } catch (err) {
+        setError(true)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchAll()
   }, [])
 
   const ongoingTournaments = tournaments.filter(t => t.status?.toLowerCase() === 'ongoing')
-  const upcomingMatches    = matches.filter(m => m.status?.toLowerCase() === 'upcoming').slice(0, 5)
+  const upcomingMatches    = matches.filter(m => m.status?.toLowerCase() === 'scheduled' || m.status?.toLowerCase() === 'ongoing').slice(0, 5)
   const overdueIssuances   = issuances.filter(i => i.status !== 'returned' && new Date(i.due_date) < new Date())
   const lowStockItems      = items.filter(i => i.available_qty === 0 || (i.total_qty > 0 && i.available_qty / i.total_qty <= 0.25))
   const pendingBookings    = bookings.filter(b => b.status?.toLowerCase() === 'pending')
@@ -43,7 +68,7 @@ export default function DashboardPage() {
   const fmtDate = (d: string) => new Date(d).toLocaleDateString('en-PK', { day: 'numeric', month: 'short' })
 
   const summaryCards: SummaryCard[] = [
-    { label: 'Tournaments', value: tournaments.length, icon: <Trophy size={20} />, color: '#1565c0', bg: '#e3f2fd', to: '/tournaments' },
+    { label: 'Tournaments', value: tournaments.length, icon: <Trophy size={20} />, color: '#1565c0', bg: 'var(--primary-pale)', to: '/tournaments' },
     { label: 'Matches',     value: matches.length,     icon: <Calendar size={20} />, color: '#c62828', bg: '#ffebee', to: '/matches' },
     { label: 'Players',     value: players.length,     icon: <User size={20} />,     color: '#2e7d32', bg: '#e8f5e9', to: '/players' },
     { label: 'Teams',       value: teams.length,       icon: <Users size={20} />,    color: '#e65100', bg: '#fff3e0', to: '/teams' },
@@ -66,6 +91,15 @@ export default function DashboardPage() {
           </div>
           <div className="dash-banner-icon"><TrendingUp size={48} strokeWidth={1.2} /></div>
         </div>
+
+        {error && (
+          <div className="alert alert-error" style={{ marginBottom: 24, display: 'flex', alignItems: 'center', gap: 12 }}>
+            <AlertTriangle size={20} />
+            <div>
+              <strong>Connection Error:</strong> We couldn't fetch some data from the server. Please check your connection or database.
+            </div>
+          </div>
+        )}
 
         {/* Summary cards */}
         {loading ? (

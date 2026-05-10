@@ -32,7 +32,8 @@ export default function LoginPage() {
       const meUser: MeUser = {
         user_id: data.user_id,
         roll_number: data.roll_number,
-        full_name: data.full_name,
+        first_name: data.first_name,
+        last_name: data.last_name,
         email: data.email,
         role: data.role,
       }

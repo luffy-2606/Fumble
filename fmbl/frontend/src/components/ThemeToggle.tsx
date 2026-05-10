@@ -7,7 +7,10 @@ export default function ThemeToggle() {
   })
 
   useEffect(() => {
-    document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light')
+    const root = document.documentElement
+    root.setAttribute('data-theme', dark ? 'dark' : 'light')
+    // Ensure body bg updates immediately (prevent flash)
+    document.body.style.backgroundColor = dark ? '#0f172a' : ''
     localStorage.setItem('theme', dark ? 'dark' : 'light')
   }, [dark])
 
@@ -16,7 +19,7 @@ export default function ThemeToggle() {
       onClick={() => setDark(d => !d)}
       style={{
         background: 'transparent',
-        border: '2px solid var(--gray-200)',
+        border: '2px solid var(--border)',
         borderRadius: '50%',
         width: 38,
         height: 38,
@@ -28,8 +31,9 @@ export default function ThemeToggle() {
         transition: 'all 0.2s ease'
       }}
       title={dark ? 'Switch to light mode' : 'Switch to dark mode'}
+      aria-label={dark ? 'Switch to light mode' : 'Switch to dark mode'}
     >
       {dark ? <Sun size={18} /> : <Moon size={18} />}
     </button>
   )
-}
+}

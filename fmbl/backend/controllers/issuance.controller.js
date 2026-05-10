@@ -8,7 +8,9 @@ const getAllIssuances = async (req, res) => {
 
         const request = pool.request();
         let query = `
-            SELECT ii.issuance_id, u.first_name, u.last_name, u.roll_number,
+            SELECT ii.issuance_id, u.first_name, u.last_name, 
+                   (u.first_name + ' ' + u.last_name) AS full_name,
+                   u.roll_number,
                    si.item_name, ii.quantity,
                    ii.issued_at, ii.due_date, ii.returned_at, ii.status
             FROM Item_Issuance ii

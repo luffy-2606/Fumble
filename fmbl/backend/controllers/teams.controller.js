@@ -1,18 +1,36 @@
 const { sql, poolPromise } = require('../config/db');
 
-// GET /api/teams - optional ?sport_id=1
+// GET /api/teams - optional ?sport_id=1&status=pending|approved
 const getAllTeams = async (req, res) => {
     try {
         const pool = await poolPromise;
-        const { sport_id } = req.query;
+        const { sport_id, status } = req.query;
+        const isAdmin = req.user?.role === 'admin';
+
+        const request = pool.request();
+        let conditions = [];
+
+        if (sport_id) conditions.push(`t.sport_id = ${parseInt(sport_id)}`);
+
+        // Students only see approved teams; admins can filter by status
+        if (!isAdmin) {
+            conditions.push(`t.status = 'approved'`);
+        } else if (status) {
+            request.input('status', sql.VarChar, status);
+            conditions.push(`t.status = @status`);
+        }
+
         let query = `
             SELECT t.team_id, t.team_name, s.sport_name,
-                   (u.first_name + ' ' + u.last_name) AS captain_name, u.roll_number AS captain_roll, t.created_at
+                   (u.first_name + ' ' + u.last_name) AS captain_name, u.roll_number AS captain_roll,
+                   t.created_at, t.status
             FROM Teams t
             JOIN Sports s ON t.sport_id   = s.sport_id
             JOIN Users  u ON t.captain_id = u.user_id`;
-        if (sport_id) query += ` WHERE t.sport_id = ${parseInt(sport_id)}`;
-        const result = await pool.request().query(query);
+
+        if (conditions.length) query += ' WHERE ' + conditions.join(' AND ');
+
+        const result = await request.query(query);
         res.json(result.recordset);
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -52,13 +70,16 @@ const createTeam = async (req, res) => {
         return res.status(400).json({ error: 'team_name, sport_id, and captain_id are required' });
     try {
         const pool = await poolPromise;
+        // Admin-created teams are immediately approved; student-created are pending
+        const initialStatus = req.user?.role === 'admin' ? 'approved' : 'pending';
         const result = await pool.request()
             .input('team_name', sql.VarChar, team_name)
             .input('sport_id', sql.Int, sport_id)
             .input('captain_id', sql.Int, captain_id)
-            .query(`INSERT INTO Teams (team_name, sport_id, captain_id)
+            .input('status', sql.VarChar, initialStatus)
+            .query(`INSERT INTO Teams (team_name, sport_id, captain_id, status)
                     OUTPUT INSERTED.*
-                    VALUES (@team_name, @sport_id, @captain_id)`);
+                    VALUES (@team_name, @sport_id, @captain_id, @status)`);
 
         // Auto-add captain as member
         await pool.request()
@@ -67,6 +88,24 @@ const createTeam = async (req, res) => {
             .query('INSERT INTO Team_Members (team_id, user_id) VALUES (@team_id, @user_id)');
 
         res.status(201).json(result.recordset[0]);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};
+
+// PATCH /api/teams/:id/approve  (admin only)
+const approveTeam = async (req, res) => {
+    const { status } = req.body;
+    const allowed = ['approved', 'pending', 'rejected'];
+    if (!allowed.includes(status)) return res.status(400).json({ error: 'Invalid status' });
+    try {
+        const pool = await poolPromise;
+        const result = await pool.request()
+            .input('id', sql.Int, req.params.id)
+            .input('status', sql.VarChar, status)
+            .query(`UPDATE Teams SET status = @status OUTPUT INSERTED.* WHERE team_id = @id`);
+        if (!result.recordset.length) return res.status(404).json({ error: 'Team not found' });
+        res.json(result.recordset[0]);
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
@@ -138,4 +177,4 @@ const getOpponents = async (req, res) => {
     }
 };
 
-module.exports = { getAllTeams, getTeamById, createTeam, addMember, removeMember, deleteTeam, getOpponents };
+module.exports = { getAllTeams, getTeamById, createTeam, approveTeam, addMember, removeMember, deleteTeam, getOpponents };

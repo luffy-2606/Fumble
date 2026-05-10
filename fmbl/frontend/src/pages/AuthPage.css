@@ -9,6 +9,10 @@
   overflow: hidden;
 }
 
+[data-theme="dark"] .auth-page {
+  background: linear-gradient(160deg, #0f172a 0%, #162032 60%);
+}
+
 .auth-bg-blob {
   position: absolute;
   border-radius: 50%;
@@ -93,10 +97,9 @@
 
 .auth-tab-indicator {
   position: absolute;
-  top: 4px;
-  bottom: 4px;
+  top: 4px; bottom: 4px;
   width: calc(50% - 4px);
-  background: white;
+  background: var(--bg-surface);
   border-radius: var(--radius-sm);
   box-shadow: var(--shadow-sm);
   transition: left 0.25s cubic-bezier(0.4, 0, 0.2, 1);

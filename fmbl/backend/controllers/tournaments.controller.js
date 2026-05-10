@@ -62,6 +62,8 @@ const createTournament = async (req, res) => {
         return res.status(400).json({ error: 'name, sport_id, and organizer_id are required' });
     try {
         const pool = await poolPromise;
+        // Admin-created tournaments are 'approved'; student-created are 'proposed' (pending)
+        const initialStatus = req.user?.role === 'admin' ? 'approved' : 'proposed';
         const result = await pool.request()
             .input('name', sql.VarChar, name)
             .input('sport_id', sql.Int, sport_id)
@@ -69,9 +71,10 @@ const createTournament = async (req, res) => {
             .input('start_date', sql.Date, start_date)
             .input('end_date', sql.Date, end_date)
             .input('venue_id', sql.Int, venue_id)
-            .query(`INSERT INTO Tournaments (name, sport_id, organizer_id, start_date, end_date, venue_id)
+            .input('status', sql.VarChar, initialStatus)
+            .query(`INSERT INTO Tournaments (name, sport_id, organizer_id, start_date, end_date, venue_id, status)
                     OUTPUT INSERTED.*
-                    VALUES (@name, @sport_id, @organizer_id, @start_date, @end_date, @venue_id)`);
+                    VALUES (@name, @sport_id, @organizer_id, @start_date, @end_date, @venue_id, @status)`);
         res.status(201).json(result.recordset[0]);
     } catch (err) {
         res.status(500).json({ error: err.message });

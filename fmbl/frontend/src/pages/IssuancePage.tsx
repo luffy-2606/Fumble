@@ -9,6 +9,7 @@ const FILTERS = ['all', 'issued', 'overdue', 'returned']
 
 export default function IssuancePage() {
   const { user } = useAuth()
+  const isAdmin = user?.role === 'admin'
   const [data, setData] = useState<Issuance[]>([])
   const [items, setItems] = useState<Item[]>([])
   const [users, setUsers] = useState<User[]>([])
@@ -173,15 +174,18 @@ export default function IssuancePage() {
                     <StatusBadge status={isOverdue(item.due_date, item.status) ? 'overdue' : item.status} />
                   </td>
                   <td>
-                    {item.status !== 'returned' && (
+                    {item.status !== 'returned' && isAdmin && (
                       <button
                         className="btn btn-sm btn-outline"
                         style={{ fontSize: '0.72rem', padding: '4px 10px' }}
                         disabled={returning === item.issuance_id}
                         onClick={() => handleReturn(item.issuance_id)}
                       >
-                        {returning === item.issuance_id ? '…' : 'Return'}
+                        {returning === item.issuance_id ? '…' : 'Mark Returned'}
                       </button>
+                    )}
+                    {item.status !== 'returned' && !isAdmin && (
+                      <span className="text-muted text-sm">—</span>
                     )}
                   </td>
                 </tr>
