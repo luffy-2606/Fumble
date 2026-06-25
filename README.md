@@ -3,7 +3,7 @@
 
 # Fumble
 
-**Final Project – Database Management Systems**
+<img width="1536" height="1024" alt="Fumble Cover" src="https://github.com/user-attachments/assets/c31846d6-ae12-4fba-92a6-d697334a1427" />
 
 ## Project Overview
 
